@@ -1,69 +1,81 @@
-﻿var announcement = document.getElementById("one")
-var announcementClose = document.getElementById("two")
-var menuToggle = document.getElementById("three")
-var sideMenu = document.getElementById("four")
-var sideMenuClose = document.getElementById("five")
-var wishlistIcons = document.querySelectorAll(".six")
-var heroImg = document.getElementById("heroImg")
-var leftArrow = document.getElementById("left")
-var rightArrow = document.getElementById("right")
-
-announcementClose.addEventListener("click", function () {
-    announcement.style.display = "none"
+﻿document.addEventListener("DOMContentLoaded", () => {
+    setupAnnouncement()
+    setupSideMenu()
+    setupWishlist()
+    setupHeroSlider()
 })
 
-menuToggle.addEventListener("click", function () {
-    sideMenu.classList.toggle("is-open")
-})
+function setupAnnouncement() {
+    const announcement = document.getElementById("one")
+    const close = document.getElementById("two")
+    if (!announcement || !close) return
 
-sideMenuClose.addEventListener("click", function () {
-    sideMenu.classList.remove("is-open")
-})
+    close.addEventListener("click", () => {
+        announcement.style.display = "none"
+    })
+}
 
-wishlistIcons.forEach(function (icon) {
+function setupSideMenu() {
+    const menuToggle = document.getElementById("three")
+    const sideMenu = document.getElementById("four")
+    const sideMenuClose = document.getElementById("five")
+    if (!menuToggle || !sideMenu) return
 
-    icon.addEventListener("click", function () {
+    const openMenu = () => {
+        sideMenu.classList.add("is-open")
+        menuToggle.setAttribute("aria-expanded", "true")
+    }
 
-        if (icon.classList.contains("fa-solid")) {
-            icon.classList.remove("fa-solid")
-            icon.classList.add("fa-regular")
-            icon.style.color = "rgb(22,22,22)"
-        }
-        else {
-            icon.classList.add("fa-solid")
-            icon.classList.remove("fa-regular")
-            icon.style.color = "rgb(229,57,28)"
-        }
+    const closeMenu = () => {
+        sideMenu.classList.remove("is-open")
+        menuToggle.setAttribute("aria-expanded", "false")
+    }
 
+    menuToggle.addEventListener("click", () => {
+        sideMenu.classList.contains("is-open") ? closeMenu() : openMenu()
     })
 
-})
+    sideMenuClose?.addEventListener("click", closeMenu)
 
-var images = [
-    "./img/p26.webp",
-    "./img/p17.webp",
-    "./img/p27.webp"
-]
+    sideMenu.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", closeMenu)
+    })
 
-var index = 0
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeMenu()
+    })
+}
 
-rightArrow.addEventListener("click", function () {
+function setupWishlist() {
+    document.querySelectorAll(".wishlist").forEach(icon => {
+        icon.addEventListener("click", () => {
+            const liked = !icon.classList.contains("fa-solid")
 
-    if (index < images.length - 1) {
-        index++
+            icon.classList.toggle("fa-solid", liked)
+            icon.classList.toggle("fa-regular", !liked)
+            icon.style.color = liked ? "rgb(229,57,28)" : "rgb(22,22,22)"
+        })
+    })
+}
+
+function setupHeroSlider() {
+    const heroImg = document.getElementById("heroImg")
+    const leftArrow = document.getElementById("left")
+    const rightArrow = document.getElementById("right")
+    if (!heroImg || !leftArrow || !rightArrow) return
+
+    const images = [
+        "./img/p26.webp",
+        "./img/p17.webp",
+        "./img/p27.webp"
+    ]
+    let index = 0
+
+    const showSlide = newIndex => {
+        index = (newIndex + images.length) % images.length
+        heroImg.src = images[index]
     }
 
-    heroImg.src = images[index]
-
-})
-
-leftArrow.addEventListener("click", function () {
-
-    if (index > 0) {
-        index--
-    }
-
-    heroImg.src = images[index]
-
-})
-
+    rightArrow.addEventListener("click", () => showSlide(index + 1))
+    leftArrow.addEventListener("click", () => showSlide(index - 1))
+}
